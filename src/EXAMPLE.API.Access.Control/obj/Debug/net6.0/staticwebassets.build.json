@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "mw4TyBoge0VUufw1Gaeqp202QDkR9SoFo+3+ByBYeO8=",
+  "Source": "EXAMPLE.API.Access.Control",
+  "BasePath": "_content/EXAMPLE.API.Access.Control",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

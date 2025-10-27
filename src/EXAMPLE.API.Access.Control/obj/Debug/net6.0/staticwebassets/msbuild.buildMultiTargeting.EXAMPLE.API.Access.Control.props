@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\EXAMPLE.API.Access.Control.props" />
+</Project>

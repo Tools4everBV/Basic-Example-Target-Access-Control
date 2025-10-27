@@ -23,8 +23,8 @@ If you have any questions or concerns, feel free to contact us. We are always ha
 ## What's in the repo?
 
 This repo contains the following:
-- Source code for the 'EXAMPLE.API.Access.Control' in the `src` folder.
-- Postman collection with all API calls and examples in the `assets` folder.
+- Source code for the 'EXAMPLE.API.Access.Control' API in the `src` folder.
+- A swagger.yaml file with the api definitions that can be loaded in a swagger editor, so the definitions can be viewed without running the sample api.
 
 ## Table of contents
 - [Basic-Example-Target-Access-Control](#basic-example-target-access-control)
@@ -40,25 +40,29 @@ This repo contains the following:
     - [Role related actions](#role-related-actions)
       - [`GET: /api/Roles`](#get-apiroles)
     - [User related actions](#user-related-actions)
+      - [`GET: /api/Users`](#get-apiusers)
       - [`POST: /api/Users`](#post-apiusers)
       - [`GET: /api/Users/ByEmployeeId/:employeeId`](#get-apiusersbyemployeeidemployeeid)
       - [`GET: /api/Users/:Id`](#get-apiusersid)
       - [`PATCH: /api/Users/:id`](#patch-apiusersid)
       - [`DEL: /api/Users/:id`](#del-apiusersid)
     - [Authorization related actions](#authorization-related-actions)
-      - [`POST: /api/Users/Authorizations/Add`](#post-apiusersauthorizationsadd)
-      - [`DEL: /api/Users/Authorizations/Delete?roleId=:roleId&userId=:id`](#del-apiusersauthorizationsdeleteroleidroleiduseridid)
+      - [`GET: /api/RoleAuthorizations`](#get-apiroleauthorizations)
+      - [`POST: /api/RoleAuthorizations/Add`](#post-apiroleauthorizationsadd)
+      - [`DEL: /api/RoleAuthorizations/Delete?roleId=:roleId&userId=:id`](#del-apiroleauthorizationsdeleteroleidroleiduseridid)      
     - [AccessKey related actions](#accesskey-related-actions)
-      - [`GET: /api/Users/AccessKeys`](#get-apiusersaccesskeys)
-      - [`DEL /api/Users/AccessKeys/Delete?accessKeyId=:accessKeyId&userId=:userId`](#del-apiusersaccesskeysdeleteaccesskeyidaccesskeyiduseriduserid)
+      - [`GET: /api/AccessKeyAssignments/:userid/AccessKeys`](#get-apiaccesskeyassignmentsuseridaccesskeys)
+      - [`DEL: /api/AccessKeyAssignments/Delete?accessKeyId=:accessKeyId&userId=:userId`](#del-apiaccesskeyassignmentsdeleteaccesskeyidaccesskeyiduseriduserid)
+      - [`PATCH: /api/AccessKeys/:id`](#patch-apiaccesskeysid)
     - [Schemas](#schemas)
       - [User](#user)
       - [Role](#role)
-      - [RoleAuthorization](#roleauthorization)
+      - [RoleAuthorization](#roleauthorization)      
       - [AccessKey](#accesskey)
+      - [AccessKeyAssignment] (#accesskeyassignment)
 
 ## Prerequisites
-- The .NET 6.0 SDK is required in order to use the API. Download from: https://dotnet.microsoft.com/en-us/download
+- The .NET 8.0 SDK is required in order to use the API. Download from: https://dotnet.microsoft.com/en-us/download
 
 ## Running the project
 Download the content of this repo directly using the zip file.
@@ -91,17 +95,22 @@ The following actions are available:
 | ----------- | --------------------------- | ------------------- |
 | GET         | [/api/Roles](#get-apiroles) | Retrieves all roles |
 
+
 #### `GET: /api/Roles`
 Before we can assign a role to a user, we first need to retrieve all available roles. Then, we build out our business rules to, ultimately grant authorizations to users based on information coming from an HR source.
 
 ### User related actions
 | HTTP Method | Endpoint                                                                   | Description               |
 | ----------- | -------------------------------------------------------------------------- | ------------------------- |
-| POST        | [/api/Users](#post-apiusers)                                               | Adds a user               |
-| GET         | [/api/Users/ByEmployeeId/:employeeId](#get-apiusersbyemployeeidemployeeid) | Gets a user by employeeId |
-| GET         | [/api/Users/:Id](#get-apiusersid)                                          | Gets a user by Id         |
-| PATCH       | [/api/Users/:id](#patch-apiusersid)                                        | Updates a user            |
-| DEL         | [/api/Users/:id](#del-apiusersid)                                          | Deletes a user            |
+| GET         | [/api/Users](#get-apiusers)                                                | Get all users
+| POST        | [/api/Users](#post-apiusers)                                               | Add a user               |
+| GET         | [/api/Users/ByEmployeeId/:employeeId](#get-apiusersbyemployeeidemployeeid) | Get a user by employeeId |
+| GET         | [/api/Users/:Id](#get-apiusersid)                                          | Get a user by Id         |
+| PATCH       | [/api/Users/:id](#patch-apiusersid)                                        | Update a user            |
+| DEL         | [/api/Users/:id](#del-apiusersid)                                          | Delete a user            |
+
+#### `GET: /api/Users`
+We need to retrieve information about all users to support our import entitlement feature, enable reconciliation, and ultimately ensure proper [governance](#governance).
 
 #### `POST: /api/Users`
 
@@ -136,14 +145,18 @@ This action does not require a response. A [204 No Content] is sufficient.
 
 | HTTP Method | Endpoint | Description |
 | --- | --- |--- |
-| POST | [/api/Authorizations/Add](#post-apiusersauthorizationsadd) | Add a new authorization for a specific user |
-| DEL | [/api/Authorizations/Delete?roleId=:roleId&userId=:userId](#del-apiusersauthorizationsdeleteroleidroleiduseridid) | Deletes an authorization for a specific user |
+| GET | [/api/RoleAuthorisations](#get-roleauthorizations) | get all role authorizations |
+| POST | [/api/RoleAuthorizations/Add](#post-apiusersauthorizationsadd) | Add a new authorization for a specific user |
+| DEL | [/api/RoleAuthorizations/Delete?roleId=:roleId&userId=:userId](#del-apiusersauthorizationsdeleteroleidroleiduseridid) | Deletes an authorization for a specific user |
 
-#### `POST: /api/Users/Authorizations/Add`
+#### `Get: /api/RoleAuthorizations`
+We need to retrieve information about all authorizations (granted to all users) to support our import entitlement feature, enable reconciliation, and ultimately ensure proper [governance](#governance).
+
+#### `POST: /api/RoleAuthorizations/Add`
 
 We will use this action when an authorization is granted to a user. Since we do not store the result in HelloID, this action does not require a response.
 
-#### `DEL: /api/Users/Authorizations/Delete?roleId=:roleId&userId=:id`
+#### `DEL: /api/RoleAuthorizations/Delete?roleId=:roleId&userId=:id`
 
 We will use this action when an authorization is revoked from a user. This action does not require a response. A [204 No Content] is sufficient.
 
@@ -151,18 +164,23 @@ We will use this action when an authorization is revoked from a user. This actio
 
 | HTTP Method | Endpoint | Description |
 | --- | --- |--- |
-| GET | [/api/Users/AccessKeys](#get-apiusersaccesskeys) | Get a list of assigned access keys|
-| DEL | [/api/Users/AccessKeys/Delete?accessKeyId=:accessKeyId&userId=:userId](#del-apiusersaccesskeysdeleteaccesskeyidaccesskeyiduseriduserid) | Deletes an accessKey (by Id) for a specific user |
+| GET   | [/api/AccessKeyAssignments/:userid/AccessKeys](#get-apiaccesskeyassignmentsuseridaccesskeys) | Get a list of assigned access keys |
+| DEL   | [/api/AccessKeyAssignments/Delete?accessKeyId=:accessKeyId&userId=:userId](#del-apiusersaccesskeysdeleteaccesskeyidaccesskeyiduseriduserid) | Deletes an accessKey (by Id) for a specific user |
+| PATCH | [/api/AccessKeys/:id] (#patch-apiaccesskeysid) | Updates properties of an access key |
 
-#### `GET: /api/Users/AccessKeys`
+#### `GET: /api/AccessKeyAssignments/:userid/AccessKeys`
 
 We will use this action to get a current list of accessKeys assigned to a user.
 
 > When the user account gets disabled or deleted, these accessKeys will be revoked from the user.
 
-#### `DEL /api/Users/AccessKeys/Delete?accessKeyId=:accessKeyId&userId=:userId`
+#### `DEL: /api/AccessKeyAssignments/Delete?accessKeyId=:accessKeyId&userId=:userId`
 
 We will use this action when an accessKey is revoked from a user. This action does not require a response. A [204 No Content] is sufficient.
+
+#### `PATCH /api/AccessKeys/:id` 
+
+We will use this action to update an AccessKey. This action does not require a response. A [204 No Content] is sufficient.
 
 ### Schemas
 
@@ -206,3 +224,11 @@ For example: A `PhoneNumber` for two-factor authentication or a more complex mul
 | DisplayName | The DisplayName of the AccessKey | - | <em>string</em> |
 | Type | The Type of the AccessKey<br> For example; 'visitor' or 'employee' | - | <em>string</em> |
 | IsActive | The state of the AccessKey | - | <em>string</em> |
+
+#### AccessKeyAssignment
+
+| Parameter | Description | Required | Type |
+|--- |--- | --- | --- |
+| Id | This is the internal / database Id.</br> Typically, this value will be set by the application | - | <em>int</em> |
+| AccessKeyId | The Id of the Access key. | True | <em>int</em> |
+| UserId | The Id of the user. | True | <em>int</em> |

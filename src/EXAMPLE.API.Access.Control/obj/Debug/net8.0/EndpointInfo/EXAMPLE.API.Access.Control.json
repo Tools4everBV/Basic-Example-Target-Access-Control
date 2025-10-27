@@ -1,0 +1,1378 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "HelloID Access Control target system example API",
+    "description": "This example API specifies example calls for developing a new API for an Access Control System that will be used for user provisioning from HelloID.<br>Our Starting point, we grant permissions to user accounts and the permissions assigned to a user will be applied to the accessKeys assigned to that user.</br><br>See the Github repo linked below to download the source code.</br>",
+    "contact": {
+      "name": "Tools4everBV Github",
+      "url": "https://github.com/orgs/Tools4everBV/"
+    },
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/AccessKeyAssignments": {
+      "get": {
+        "tags": [
+          "AccessKeyAssignments"
+        ],
+        "summary": "Get AccessKeyAssignments for all users (optional)",
+        "description": "<h2>Implementation notes</h2>\r\n            This can be userful for reporting, but is generally not required for HelloID because the Accesskeys are typically not assigned by HelloId",
+        "operationId": "GetAllAccessKeyAssignments",
+        "responses": {
+          "200": {
+            "description": "Returns the list of all AccessKeyAssignments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccessKeyAssignment"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required or failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AccessKeyAssignments"
+        ],
+        "summary": "Add AccessKeyAssignment (optional test)",
+        "description": "<h2>Implementation notes</h2>\r\n            We will use this action only for testing this example API, generally we do not assign access keys to users in helloID \r\n            \r\n</br>\r\n            Example:\r\n              \r\n                POST /accesskeyassignments\r\n                {\r\n                   \"accessKeyId\": 1,\r\n                   \"userId\": 1\r\n                }",
+        "operationId": "AddAccessKeyAssignment",
+        "requestBody": {
+          "description": "The authorization that will be added.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccessKeyAssignment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessKeyAssignment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "AccessKeyAssignments"
+        ],
+        "summary": "Delete AccessKeyAssignment",
+        "description": "<h2>Implementation notes</h2>\r\n            We will use this action when an AccessKey is revoked from a user. This action does not require a response. A [204 No Content] is sufficient.",
+        "operationId": "DeleteAccessKeyAssignmentByValue",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "accessKeyId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/AccessKeyAssignments/{userId}/Accesskeys": {
+      "get": {
+        "tags": [
+          "AccessKeyAssignments"
+        ],
+        "summary": "Get all assigned Access keys for a specific user",
+        "description": "<h2>Implementation notes</h2>\r\n            This returns all Access Keys currently assigned to the given user.\r\n            \r\n</br>\r\n            Useful when validating which permissions/roles the user has at a given moment.",
+        "operationId": "GetAccessKeysByUserId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a list of AccessKeyAssignments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccessKey"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required or failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "If the user does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/AccessKeyAssignments/{id}": {
+      "delete": {
+        "tags": [
+          "AccessKeyAssignments"
+        ],
+        "summary": "Delete AccessKeyAssignment (by Id)",
+        "description": "<h2>Implementation notes</h2>\r\n            We will use this action when an AccessKey is revoked from a user. This action does not require a response. A [204 No Content] is sufficient.",
+        "operationId": "DeleteAccessKeyAssignment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The authorization was successfully removed."
+          },
+          "401": {
+            "description": "Authentication required or failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No authorization with the specified Id was found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/AccessKeys": {
+      "get": {
+        "tags": [
+          "AccessKeys"
+        ],
+        "summary": "Get all Accesskeys (optional test)",
+        "description": "<h2>Implementation notes</h2>\r\n            We will use this action only for testing this example API",
+        "operationId": "GetAllAccessKeys",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccessKey"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AccessKeys"
+        ],
+        "summary": "Add Accesskey (optional test)",
+        "description": "<h2>Implementation notes</h2>\r\n            We will use this action only for testing this example API, generally we do not create access keys with HelloID \r\n            \r\n</br>\r\n            Example:\r\n              \r\n                POST /Accesskeys\r\n                {\r\n                   \"displayName\": \"Card001\",\r\n                   \"Type\":  \"Employee, Visitor or temporary\"\r\n                   \"isActive\": \"true\"\r\n                }",
+        "operationId": "AddAccessKey",
+        "requestBody": {
+          "description": "The authorization that will be added.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccessKey"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessKey"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/AccessKeys/{id}": {
+      "patch": {
+        "tags": [
+          "AccessKeys"
+        ],
+        "summary": "Update AccessKey by Id",
+        "description": "<h2>Implementation notes</h2>\r\n              We will use this action to update an AccessKey. This action does not require a response. A [204 No Content] is sufficient.\r\n             \r\n             Example:\r\n               \r\n                 PATCH /Users/:id\r\n                 [  \r\n                     {\r\n                         \"op\": \"replace\",\r\n                         \"path\": \"isActive\",\r\n                         \"value\": \"true\"\r\n                     }\r\n                 ]",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessKey"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/OAuth/token": {
+      "post": {
+        "tags": [
+          "OAuth"
+        ],
+        "summary": "Retrieve an access token using a clientId and clientSecret",
+        "description": "<h2>Implementation notes</h2>\r\n            We prefer OAuth for authentication because it’s secure, easy to use, and works smoothly with modern apps and APIs.\r\n            \r\n\r\n            Example request:\r\n            \r\n                POST /oauth/token\r\n                {\r\n                    \"client_id\": \"example-client-id\",\r\n                    \"client_secret\": \"example-client-secret\"\r\n                }",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequest"
+              },
+              "example": {"clientId":"339ddde0-7219-4895-ab65-65d5dba91fff","clientSecret":"87a3354033418b90fc00ad9d06cb2cf36baf0276181efae9ce8a1e780cc024a3"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A valid access token was issued.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request was malformed or missing required fields.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed or was not provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/RoleAuthorizations": {
+      "get": {
+        "tags": [
+          "RoleAuthorizations"
+        ],
+        "summary": "Get all authorizations for all users",
+        "description": "<h2>Implementation notes</h2>\r\n            We need to retrieve information about all authorizations to support our import entitlement feature, enable reconciliation, and ultimately ensure proper governance.",
+        "operationId": "GetAllRoleAuthorizations",
+        "responses": {
+          "200": {
+            "description": "Returns the list of all authorizations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoleAuthorization"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required or failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "RoleAuthorizations"
+        ],
+        "summary": "Add authorization",
+        "description": "<h2>Implementation notes</h2>\r\n            We will use this action when an authorization is granted to a user. Since we do not store the result in HelloID, this action does not require a response\r\n            \r\n</br>\r\n            Example:\r\n              \r\n                POST /roleauthorization\r\n                {\r\n                   \"roleId\": 1,\r\n                   \"userId\": 1\r\n                }",
+        "operationId": "AddRoleAuthorization",
+        "requestBody": {
+          "description": "The authorization that will be added.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleAuthorization"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleAuthorization"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "RoleAuthorizations"
+        ],
+        "summary": "Delete authorization",
+        "description": "<h2>Implementation notes</h2>\r\n            We will use this action when an authorization is revoked from a user. This action does not require a response. A [204 No Content] is sufficient.",
+        "operationId": "DeleteRoleAuthorizationByValue",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "roleId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/RoleAuthorizations/{userId}": {
+      "get": {
+        "tags": [
+          "RoleAuthorizations"
+        ],
+        "summary": "Get all authorizations for a specific user",
+        "description": "<h2>Implementation notes</h2>\r\n            This returns all authorizations currently assigned to the given user.\r\n            \r\n</br>\r\n            Useful when validating which permissions/roles the user has at a given moment.",
+        "operationId": "GetRoleAuthorizationsByUserId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a list of authorizations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoleAuthorization"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "If the user has no authorizations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required or failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/RoleAuthorizations/{id}": {
+      "delete": {
+        "tags": [
+          "RoleAuthorizations"
+        ],
+        "summary": "Delete authorization (by Id)",
+        "description": "<h2>Implementation notes</h2>\r\n            We will use this action when an authorization is revoked from a user. This action does not require a response. A [204 No Content] is sufficient.",
+        "operationId": "DeleteAuthorization",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The authorization was successfully removed."
+          },
+          "401": {
+            "description": "Authentication required or failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No authorization with the specified Id was found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Roles": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Get roles",
+        "description": "<h2>Implementation notes</h2>\r\n            Before we can assign a role to a user, we first need to retrieve all available roles. Then, we build out our business rules to, ultimately grant authorizations to users based on information coming from an HR source.",
+        "operationId": "GetAllRoles",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Role"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Add Role (optional test)",
+        "description": "<h2>Implementation notes</h2>\r\n            We will use this action only for testing this connector, generally we do not dynamically create roles with helloID \r\n            \r\n</br>\r\n            Example:\r\n              \r\n                POST /roles\r\n                {\r\n                   \"displayName\": \"Admin\"\r\n                   \r\n                }",
+        "operationId": "Add",
+        "requestBody": {
+          "description": "The authorization that will be added.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Role"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Role"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retrieve all users",
+        "description": "<h2>Implementation notes</h2>\r\n            This endpoint returns all users in the system.  \r\n            It is primarily used to support the import entitlement feature, enable reconciliation,\r\n            and ensure proper governance across connected systems.",
+        "operationId": "ListUsers",
+        "responses": {
+          "200": {
+            "description": "A list of users was successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed or was not provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Add user",
+        "description": "<h2>Implementation notes</h2>\r\n            Adds a new user account to the target system. The response must contain the internal database ID since this is the key we correlate on and will be used for consecutive requests to the target system. Therefore, the `id` field is enlisted in the user schema.\r\n            \r\n</br>\r\n            Example:\r\n                \r\n                POST /Users\r\n                {\r\n                   \"employeeId\": \"1000000\",\r\n                   \"firstName\": \"John\",\r\n                   \"lastName\": \"Doe\",\r\n                   \"email: \"JDoe@enyoi\",\r\n                   \"active\": \"false\"\r\n                }",
+        "operationId": "AddUser",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/ByEmployeeId/{employeeId}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user (by EmployeeId)",
+        "description": "<h2>Implementation notes</h2>\r\n            Before we add a user account to the target application, we need to validate if that user account exists.\r\n            \r\n</br>\r\n            Initially, the internal database ID is not known to us. Therefore, we prefer to validate this using the `EmployeeId` since this is unique and available in HelloID.\r\n            \r\n</br>\r\n            We only need to retrieve the user account using the `employeeId` in our initial create event. For all other events we will use the internal database ID. The `database ID` is the also key we correlate on in our create event.",
+        "operationId": "GetUserByEmployeeId",
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user (by id)",
+        "description": "<h2>Implementation notes</h2>\r\n            Before we update a particular user account, we need to validate if that user account still exists.\r\n            \r\n</br>\r\n            Validating if the user account exists is an integral part in all our lifecycle events because the user account might be <em>unintentionally</em> deleted. In which case the lifecycle event will fail. \r\n            For example: when we want to enable the user account on the day the contract takes effect.\r\n            \r\n</br>",
+        "operationId": "GetUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update user (by id)",
+        "description": "<h2>Implementation notes</h2>\r\n            To update a user account we prefer to see an update call in the form of a patch. Which means that we only update the values that have been changed.\r\n            \r\n</br><em>In this case the patch method is implemented using <a href=\"https://jsonpatch.com/\">JSON Patch</a>. Note that this might not have to be the best solution for your application.</em>\r\n</br>\r\n            Example:\r\n              \r\n                PATCH /Users/:id\r\n                [  \r\n                    {\r\n                        \"op\": \"replace\",\r\n                        \"path\": \"lastName\",\r\n                        \"value\": \"Jane\"s\r\n                    }\r\n                ]",
+        "operationId": "PatchUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete user (by id)",
+        "description": "<h2>Implementation notes</h2>\r\n            This action does not require a response. A [204 No Content] is sufficient.",
+        "operationId": "DeleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccessKey": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "This is the internal / database Id.\r\n\r\n\r\nTypically this value will be set by the application itself.\r\n</br>",
+            "format": "int32",
+            "readOnly": true
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The DisplayName of the AccessKey",
+            "nullable": true,
+            "example": "Card001"
+          },
+          "type": {
+            "type": "string",
+            "description": "The Type of the AccessKey",
+            "nullable": true,
+            "example": "Employee"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "The state of the AccessKey",
+            "nullable": true,
+            "example": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The AccessKey that are available in the target system. Like; 'Card001' or 'Card002'.\r\nThe Permissions on the accessKey are managed due to the Roles on the user object. The permissions assigned to the user object, will be applied to the assigned Accesskeys."
+      },
+      "AccessKeyAssignment": {
+        "required": [
+          "accessKeyId",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "This is the internal / database Id.\r\n\r\n\r\nTypically this value will be set by the application itself.\r\n</br>",
+            "format": "int32",
+            "readOnly": true
+          },
+          "accessKeyId": {
+            "type": "integer",
+            "description": "The Id of the AccessKeyId that will be assigned.",
+            "format": "int32",
+            "example": 1
+          },
+          "userId": {
+            "type": "integer",
+            "description": "The Id of the user who will be assigned to this accessKey.",
+            "format": "int32",
+            "example": 1
+          }
+        },
+        "additionalProperties": false,
+        "description": "A user can have multiple accessKeys. Each AccessKeyAssignment will only have one accessKey like; Card001 or LicensePlate001\r\n\r\n\r\nAn accessKey will be assigned (granted) to a user.\r\n</br>"
+      },
+      "OAuthErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "error_description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Operation": {
+        "type": "object",
+        "properties": {
+          "operationType": {
+            "$ref": "#/components/schemas/OperationType"
+          },
+          "path": {
+            "type": "string",
+            "nullable": true
+          },
+          "op": {
+            "type": "string",
+            "nullable": true
+          },
+          "from": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OperationType": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "This is the internal / database Id.\r\n\r\n\r\nTypically this value will be set by the application itself.\r\n</br>",
+            "format": "int32",
+            "readOnly": true
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The DisplayName of the role",
+            "nullable": true,
+            "example": "Admin"
+          }
+        },
+        "additionalProperties": false,
+        "description": "The roles that are available in the target system. Like; 'Cleaner', 'Security' or 'Employee'.\r\nA Role of an Access Control System usual contains a set of doors (possible with timeslots) that the user allowed to open.\r\nThis implemntation assumes the roles are granted to the user, and the accessKey are assgined to the user. \r\nThe granted roles are applied to the accessKeys assigned to a user."
+      },
+      "RoleAuthorization": {
+        "required": [
+          "roleId",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "This is the internal / database Id.\r\n\r\n\r\nTypically this value will be set by the application itself.\r\n</br>",
+            "format": "int32",
+            "readOnly": true
+          },
+          "roleId": {
+            "type": "integer",
+            "description": "The Id of the role that will be assigned.",
+            "format": "int32",
+            "example": 1
+          },
+          "userId": {
+            "type": "integer",
+            "description": "The Id of the user who will be assigned to this authorization.",
+            "format": "int32",
+            "example": 1
+          }
+        },
+        "additionalProperties": false,
+        "description": "A user can have multiple authorizations. Each authorization will only have one role Like; 'Cleaner', 'Security' or 'Employee'.\r\n\r\n\r\nA user will be assigned (granted) to an authorization.\r\n</br>"
+      },
+      "TokenRequest": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "description": "The ClientId to authenticate to the example API.",
+            "nullable": true,
+            "example": "example-client-id"
+          },
+          "client_secret": {
+            "type": "string",
+            "description": "The ClientSecret to authenticate to the example API.",
+            "nullable": true,
+            "example": "example-client-secret"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TokenResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "nullable": true
+          },
+          "token_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "expires_in": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "User": {
+        "required": [
+          "active",
+          "email",
+          "employeeId",
+          "firstName",
+          "lastName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "This is the internal / database Id.\r\n\r\n\r\nTypically this value will be set by the application itself.\r\n</br>",
+            "format": "int32",
+            "readOnly": true
+          },
+          "employeeId": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The EmployeeId or ExternalId of the user.",
+            "example": "100000"
+          },
+          "firstName": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The firstName of the user.",
+            "example": "John"
+          },
+          "lastName": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The lastName of the user.",
+            "example": "Doe"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The email address of the user.",
+            "example": "J.Doe@enyoi"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Defines if the user is active or not. We will update this value when a user is enabled or disabled.\r\n\r\n<h3>Remarks</h3>\r\nDefines if the user is active or not. We will update this value when a user is enabled or disabled. \r\nWhen we initially create a user, we prefer to create that user in a `disabled state`. On the day the contract takes effect the user account will be enabled.\r\n</br>",
+            "example": false
+          }
+        },
+        "additionalProperties": false,
+        "description": "The user schema contains all the parameters we expect to be present in an application.\r\n\r\n\r\nYour application / user schema might have different names for parameters, or far more parameters than enlisted in this schema.\r\nFor example: A 'PhoneNumber' for two-factor authentication or a more complex multi-layered schema.\r\n</br>\r\n\r\nThis schema contains the bare minimum we need in order to build a solid connector.\r\n</br>"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "The bearer token",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}
