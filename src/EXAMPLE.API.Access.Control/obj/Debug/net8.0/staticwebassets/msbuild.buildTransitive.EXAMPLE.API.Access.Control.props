@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\EXAMPLE.API.Access.Control.props" />
-</Project>
