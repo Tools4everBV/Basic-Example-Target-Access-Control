@@ -10,7 +10,7 @@ Card / Access control systems are uses to monitor, manage and grant access to pa
 >
 > These roles will be applied to the access key that's assigned to the user.
 
-The swagger interface can be found on: https://app.swaggerhub.com/apis-docs/ConnectorTeam/Basic-EXAMPLE-Target-API-Access-Control/1.0.1
+The swagger interface can be found on: https://app.swaggerhub.com/apis-docs/ConnectorTeam/Basic-EXAMPLE-Target-API-Access-Control/2.0
 
 ## About
 
@@ -135,7 +135,7 @@ Before we update a particular user account, we need to validate if that user acc
 
 To update a user account we prefer to see an update call in the form of a patch. This means that we only update the values that have been changed.
 
-> :exclamation: In the `Basic-EXAMPLE-Target-API` the patch method is implemented using <a href="https://jsonpatch.com/">JSON Patch</a>. Note that this might not have to be the best solution for your application.
+> :exclamation: In the `Basic-EXAMPLE-Target-Access-Control-API-` the patch method is implemented using <a href="https://jsonpatch.com/">JSON Patch</a>. Note that this might not have to be the best solution for your application.
 
 #### `DEL: /api/Users/:id`
 
