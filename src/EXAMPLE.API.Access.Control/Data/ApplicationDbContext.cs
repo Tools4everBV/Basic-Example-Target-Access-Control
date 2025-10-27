@@ -11,10 +11,10 @@ namespace EXAMPLE.API.Access.Control.Data
     public class ApplicationDbContext : DbContext
     {
         public DbSet<User>? User { get; set; }
-        public DbSet<RoleAuthorization>? Authorization { get; set; }
+        public DbSet<RoleAuthorization>? RoleAuthorization { get; set; }
         public DbSet<Role>? Role { get; set; }
         public DbSet<AccessKey>? AccessKey { get; set; }
-        public DbSet<AccessKeyAssignments>? AccessKeyAssignment { get; set; }
+        public DbSet<AccessKeyAssignment>? AccessKeyAssignment { get; set; }
 
         /// <summary>
         /// This method configures EFCore so that EFCore knows where to look for the database.

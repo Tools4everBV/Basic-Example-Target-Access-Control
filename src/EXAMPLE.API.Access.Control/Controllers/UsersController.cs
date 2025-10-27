@@ -3,13 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using EXAMPLE.API.Access.Control.Data;
 using EXAMPLE.API.Access.Control.Data.Models;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EXAMPLE.API.Access.Control.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     [Consumes("application/json")]
-    [Produces("application/json")]
+    [Produces("application/json")]  
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -17,7 +19,29 @@ namespace EXAMPLE.API.Access.Control.Controllers
         public UsersController(ApplicationDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-        }       
+        }
+
+
+        // GET: api/users
+        /// <summary>
+        /// Retrieve all users
+        /// </summary>
+        /// <remarks>
+        /// <h2>Implementation notes</h2>
+        /// This endpoint returns all users in the system.  
+        /// It is primarily used to support the import entitlement feature, enable reconciliation,
+        /// and ensure proper governance across connected systems.
+        /// </remarks>
+        /// <response code="200">A list of users was successfully retrieved.</response>
+        /// <response code="401">Authentication failed or was not provided.</response>
+        [HttpGet(Name = "ListUsers")]
+        [ProducesResponseType(typeof(List<User>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        {
+            return await _context.User.ToListAsync();
+        }
+
 
         // GET: api/Users/:emloyeeId
         /// <summary>
@@ -36,6 +60,7 @@ namespace EXAMPLE.API.Access.Control.Controllers
         [HttpGet("ByEmployeeId/{employeeId}", Name = "GetUserByEmployeeId")]
         [ActionName(nameof(GetUserByEmployeeId))]
         [ProducesResponseType(typeof(User), 200)]
+        [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<ActionResult<User>> GetUserByEmployeeId(string employeeId)
         {
@@ -66,6 +91,7 @@ namespace EXAMPLE.API.Access.Control.Controllers
         [HttpGet("{id:int}", Name = "GetUserById")]
         [ActionName(nameof(GetUserById))]
         [ProducesResponseType(typeof(User), 200)]
+        [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<ActionResult<User>> GetUserById(int id)
         {
@@ -95,7 +121,7 @@ namespace EXAMPLE.API.Access.Control.Controllers
         ///         {
         ///             "op": "replace",
         ///             "path": "lastName",
-        ///             "value": "Jane"
+        ///             "value": "Jane"s
         ///         }
         ///     ]
         ///     
@@ -104,9 +130,10 @@ namespace EXAMPLE.API.Access.Control.Controllers
         /// <param name="patchDoc"></param>
         /// <response code="200"></response>
         [HttpPatch("{id}", Name = "PatchUser")]
-        [ProducesResponseType(typeof(User), 200)]
-        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(User), 200)]       
         [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> PatchUser(int id, [FromBody] JsonPatchDocument<User> patchDoc)
         {
             var entity = await _context.User.FindAsync(id);
@@ -153,66 +180,9 @@ namespace EXAMPLE.API.Access.Control.Controllers
 
             return CreatedAtAction(nameof(GetUserById), new { Id = User.Id }, User);
         }
+        
+       
 
-        // POST: api/Users/:id/Authorizations
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        /// <summary>
-        /// Add authorization
-        /// </summary>
-        /// <remarks>
-        /// <h2>Implementation notes</h2>
-        /// We will use this action when an authorization is granted to a user. Since we do not store the result in HelloID, this action does not require a response
-        /// <br></br>
-        /// Example:
-        ///   
-        ///     POST /Users/:id/Authorizations
-        ///     {
-        ///        "roleId": 1,
-        ///        "userId": 1
-        ///     }
-        ///     
-        /// </remarks>
-        /// <param name="auth">The authorization that will be added.</param>
-        /// <response code="201"></response>
-        [HttpPost("Authorizations/Add", Name = "AddAuthorization")]
-        [ProducesResponseType(typeof(RoleAuthorization), 201)]
-        [ProducesResponseType(400)]
-        public async Task<ActionResult<RoleAuthorization>> PostAuthorization([FromBody] RoleAuthorization auth)
-        {
-            _context.Authorization.Add(auth);
-            await _context.SaveChangesAsync();
-
-            return new ObjectResult(auth) { StatusCode = StatusCodes.Status201Created };
-        }
-
-        // DELETE: api/Users/:id
-        /// <summary>
-        /// Delete authorization
-        /// </summary>
-        /// <remarks>
-        /// <h2>Implementation notes</h2>
-        /// We will use this action when an authorization is revoked from a user. This action does not require a response. A [204 No Content] is sufficient.
-        /// </remarks>
-        /// <param name="auth">The authorization that will be removed.</param>
-        /// <response code="204"></response>
-        [HttpDelete("Authorizations/Delete", Name = "DeleteAuthorization")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public async Task<IActionResult> DeleteAuthorization(int userId, int roleId)
-        {
-            var user = await _context.User.FindAsync(userId);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            var userAuths = await _context.Authorization.Where(a => a.UserId == user.Id).ToListAsync();
-            var authToRemove = userAuths.Where(a => a.RoleId == roleId).SingleOrDefault();
-            _context.Authorization.Remove(authToRemove);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
 
         // DELETE: api/Users/:id
         /// <summary>
@@ -226,6 +196,7 @@ namespace EXAMPLE.API.Access.Control.Controllers
         /// <response code="204"></response>
         [HttpDelete("{id}", Name = "DeleteUser")]
         [ProducesResponseType(204)]
+        [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -240,70 +211,7 @@ namespace EXAMPLE.API.Access.Control.Controllers
 
             return NoContent();
         }
-
-        // GET: api/AccessKeys
-        /// <summary>
-        /// Get a list of assigned AccessKeys
-        /// </summary>
-        /// <remarks>
-        /// <h2>Implementation notes</h2>
-        /// We will use this action to get the current assigned Access Keys, so we able to revoke the assigned Accesskeys, during disable/delete of a user or any other changes in the Business Rules
-        /// </remarks>
-        /// <response code="200"></response>
-        [HttpGet("AccessKeys", Name = "GetAccessKeys")]
-        [ProducesResponseType(typeof(List<AccessKey>), 200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult<IEnumerable<AccessKey>>> GetAccessKey(int userId)
-        {
-            var user = await _context.User.FindAsync(userId);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            var accessKeysAssignments = await _context.AccessKeyAssignment.Where(a => a.UserId == userId).ToListAsync();
-            var accessKeys = _context.AccessKey.Where(a => accessKeysAssignments.Select(a => a.Id).Contains(a.Id));
-
-            return Ok(accessKeys);
-        }
-
-
-        // Delete: api/AccessKeys
-        /// <summary>
-        /// Delete AccessKey by Id
-        /// </summary>
-        /// <remarks>
-        /// <h2>Implementation notes</h2>
-        ///  We will use this action when an AccessKey is revoked from a user. This action does not require a response. A [204 No Content] is sufficient.
-        /// </remarks>
-        /// <response code="204"></response>
-        [HttpDelete("AccessKeys/Delete")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult> DeleteAccessKey(int userId, int AccessKeyId)
-        {
-            var user = await _context.User.FindAsync(userId);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            //var assignedAccessKeyList = new List<AccessKeyAssignments>();
-            var assignedAccessKeyList = await _context.AccessKeyAssignment.Where(a => a.UserId == userId).ToListAsync();
-
-            if (assignedAccessKeyList != null)
-            {
-                var accessKeyToRemove = assignedAccessKeyList.SingleOrDefault(a => a.AccessKeyId == AccessKeyId);
-
-                if (accessKeyToRemove != null)
-                {
-                    _context.AccessKeyAssignment.Remove(accessKeyToRemove);
-                    await _context.SaveChangesAsync();
-
-                }
-            }
-            return NoContent();
-        }
+        
     }
 
 }

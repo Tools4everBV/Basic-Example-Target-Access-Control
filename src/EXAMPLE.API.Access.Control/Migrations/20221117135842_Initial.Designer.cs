@@ -40,7 +40,7 @@ namespace EXAMPLE.API.Access.Control.Migrations
                     b.ToTable("AccessKey");
                 });
 
-            modelBuilder.Entity("EXAMPLE.API.Access.Control.Data.Models.AccessKeyAssignments", b =>
+            modelBuilder.Entity("EXAMPLE.API.Access.Control.Data.Models.AccessKeyAssignment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -86,7 +86,7 @@ namespace EXAMPLE.API.Access.Control.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Authorization");
+                    b.ToTable("RoleAuthorization");
                 });
 
             modelBuilder.Entity("EXAMPLE.API.Access.Control.Data.Models.User", b =>

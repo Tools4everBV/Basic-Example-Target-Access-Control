@@ -17,8 +17,7 @@ namespace EXAMPLE.API.Access.Control.Data.Models
         /// Typically this value will be set by the application itself.
         /// </br>
         /// </summary>
-        [Key]
-        [JsonIgnore]
+        [Key]        
         public int Id { get; internal set; }
 
         /// <summary>

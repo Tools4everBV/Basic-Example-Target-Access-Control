@@ -28,7 +28,9 @@ namespace EXAMPLE.API.Access.Control.Data.Models
         /// <summary>
         /// The Type of the AccessKey
         /// </summary>
-        /// <example>Employee, Visitor or temporarily</example>
+        /// <example>Employee</example>
+        /// <example>Visitor</example>
+        /// <example>Temporary</example>
         public string? Type { get; set; }
 
 

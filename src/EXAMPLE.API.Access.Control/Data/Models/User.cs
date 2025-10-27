@@ -58,7 +58,7 @@ namespace EXAMPLE.API.Access.Control.Data.Models
         /// When we initially create a user, we prefer to create that user in a `disabled state`. On the day the contract takes effect the user account will be enabled.
         /// </br>
         /// </summary>
-        /// <example>False</example>
+        /// <example>false</example>
         [Required(ErrorMessage = "Active is required")]
         public bool? Active { get; set; }
     }

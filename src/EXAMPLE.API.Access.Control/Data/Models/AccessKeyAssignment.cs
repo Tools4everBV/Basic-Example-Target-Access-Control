@@ -9,7 +9,7 @@ namespace EXAMPLE.API.Access.Control.Data.Models
     /// An accessKey will be assigned (granted) to a user.
     /// </br>
     /// </summary>
-    public class AccessKeyAssignments
+    public class AccessKeyAssignment
     {
         /// <summary>
         /// This is the internal / database Id.
@@ -17,8 +17,7 @@ namespace EXAMPLE.API.Access.Control.Data.Models
         /// Typically this value will be set by the application itself.
         /// </br>
         /// </summary>
-        [Key]
-        [JsonIgnore]
+        [Key]     
         public int Id { get; internal set; }
 
         /// <summary>
